@@ -7,7 +7,7 @@ namespace Sysprog1
     {
         private const int WorkerCount = 4;
         private const int QueueMaxSize = 200;
-        private const int CacheDurationSeconds = 30;
+        private const int CacheDurationSeconds = 10;
 
         static void Main(string[] args)
         {
