@@ -16,8 +16,15 @@ namespace Sysprog1
 
             var httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
             var apiService = new ApiService(httpClient);
+
+            logger.Info("Preuzimanje naziva raketa i lansirnih mesta...");
+            var rocketNames = apiService.FetchRocketNames();
+            var launchpadNames = apiService.FetchLaunchpadNames();
+            var nameResolver = new NameResolver(rocketNames, launchpadNames);
+            logger.Info($"Učitano {rocketNames.Count} raketa i {launchpadNames.Count} lansirnih mesta.");
+
             var cache = new LaunchCache(TimeSpan.FromSeconds(CacheDurationSeconds), logger);
-            var handler = new RequestHandler(apiService, cache, logger);
+            var handler = new RequestHandler(apiService, cache, logger, nameResolver);
             var workerPool = new WorkerPool(WorkerCount, queue, handler, logger);
 
             workerPool.Start();

@@ -12,6 +12,7 @@ namespace Sysprog1.Services
         private readonly ApiService _apiService;
         private readonly LaunchCache _cache;
         private readonly Logger _logger;
+        private readonly NameResolver _nameResolver;
 
         private static readonly JsonSerializerSettings JsonSettings = new()
         {
@@ -20,11 +21,12 @@ namespace Sysprog1.Services
             NullValueHandling = NullValueHandling.Ignore
         };
 
-        public RequestHandler(ApiService apiService, LaunchCache cache, Logger logger)
+        public RequestHandler(ApiService apiService, LaunchCache cache, Logger logger, NameResolver nameResolver)
         {
             _apiService = apiService;
             _cache = cache;
             _logger = logger;
+            _nameResolver = nameResolver;
         }
 
         public void Handle(HttpListenerContext context)
@@ -51,25 +53,41 @@ namespace Sysprog1.Services
                 string url = upcoming == true ? ApiService.UpcomingUrl : ApiService.PastUrl;
                 string cacheKey = upcoming == true ? "upcoming" : "past";
 
-                // Jedan keš unos po URL-u; filtriranje se radi u memoriji
                 var allLaunches = _cache.GetOrFetch(cacheKey, () => _apiService.FetchLaunches(url));
 
-                var results = allLaunches.Where(l =>
-                {
-                    bool matchMission = string.IsNullOrEmpty(missionName) ||
-                                       l.Name.Contains(missionName, StringComparison.OrdinalIgnoreCase);
-                    bool matchSuccess = !success.HasValue || l.Success == success.Value;
-                    bool matchFlight = !flightNumber.HasValue || l.FlightNumber == flightNumber.Value;
-                    bool matchRocket = string.IsNullOrEmpty(rocket) ||
-                                      (l.Rocket != null && l.Rocket.Contains(rocket, StringComparison.OrdinalIgnoreCase));
-                    bool matchLaunchpad = string.IsNullOrEmpty(launchpad) ||
-                                         (l.Launchpad != null && l.Launchpad.Contains(launchpad, StringComparison.OrdinalIgnoreCase));
-                    bool matchDateFrom = !dateFrom.HasValue || l.DateUtc >= dateFrom.Value;
-                    bool matchDateTo = !dateTo.HasValue || l.DateUtc <= dateTo.Value;
+                var results = allLaunches
+                    .Where(l =>
+                    {
+                        bool matchMission = string.IsNullOrEmpty(missionName) ||
+                                           l.Name.Contains(missionName, StringComparison.OrdinalIgnoreCase);
+                        bool matchSuccess = !success.HasValue || l.Success == success.Value;
+                        bool matchFlight = !flightNumber.HasValue || l.FlightNumber == flightNumber.Value;
+                        bool matchRocket = string.IsNullOrEmpty(rocket) ||
+                                          (_nameResolver.ResolveRocket(l.Rocket)
+                                              ?.Contains(rocket, StringComparison.OrdinalIgnoreCase) == true);
+                        bool matchLaunchpad = string.IsNullOrEmpty(launchpad) ||
+                                             (_nameResolver.ResolveLaunchpad(l.Launchpad)
+                                                 ?.Contains(launchpad, StringComparison.OrdinalIgnoreCase) == true);
+                        bool matchDateFrom = !dateFrom.HasValue || l.DateUtc >= dateFrom.Value;
+                        bool matchDateTo = !dateTo.HasValue || l.DateUtc <= dateTo.Value;
 
-                    return matchMission && matchSuccess && matchFlight && matchRocket &&
-                           matchLaunchpad && matchDateFrom && matchDateTo;
-                }).ToList();
+                        return matchMission && matchSuccess && matchFlight && matchRocket &&
+                               matchLaunchpad && matchDateFrom && matchDateTo;
+                    })
+                    .Select(l => new LaunchResponse
+                    {
+                        Id = l.Id,
+                        Name = l.Name,
+                        DateUtc = l.DateUtc,
+                        Success = l.Success,
+                        FlightNumber = l.FlightNumber,
+                        RocketName = _nameResolver.ResolveRocket(l.Rocket),
+                        LaunchpadName = _nameResolver.ResolveLaunchpad(l.Launchpad),
+                        Details = l.Details,
+                        Upcoming = l.Upcoming,
+                        Links = l.Links
+                    })
+                    .ToList();
 
                 if (results.Count == 0)
                 {

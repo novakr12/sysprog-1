@@ -2,6 +2,24 @@ using Newtonsoft.Json;
 
 namespace Sysprog1.Models
 {
+    public class Rocket
+    {
+        [JsonProperty("id")]
+        public string Id { get; set; } = string.Empty;
+
+        [JsonProperty("name")]
+        public string Name { get; set; } = string.Empty;
+    }
+
+    public class Launchpad
+    {
+        [JsonProperty("id")]
+        public string Id { get; set; } = string.Empty;
+
+        [JsonProperty("name")]
+        public string Name { get; set; } = string.Empty;
+    }
+
     public class LaunchLinks
     {
         [JsonProperty("webcast")]
@@ -44,6 +62,20 @@ namespace Sysprog1.Models
         public bool Upcoming { get; set; }
 
         [JsonProperty("links")]
+        public LaunchLinks? Links { get; set; }
+    }
+
+    public class LaunchResponse
+    {
+        public string Id { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public DateTime DateUtc { get; set; }
+        public bool? Success { get; set; }
+        public int FlightNumber { get; set; }
+        public string? RocketName { get; set; }
+        public string? LaunchpadName { get; set; }
+        public string? Details { get; set; }
+        public bool Upcoming { get; set; }
         public LaunchLinks? Links { get; set; }
     }
 }
