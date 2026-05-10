@@ -8,9 +8,9 @@ http://localhost:5000/launches?success=true
 http://localhost:5000/launches?success=false
 http://localhost:5000/launches?flightNumber=1
 http://localhost:5000/launches?flightNumber=100
-http://localhost:5000/launches?rocket=Falcon+9
-http://localhost:5000/launches?rocket=Falcon+Heavy
-http://localhost:5000/launches?rocket=Starship
+http://localhost:5000/launches?rocketName=Falcon+9
+http://localhost:5000/launches?rocketName=Falcon+Heavy
+http://localhost:5000/launches?rocketName=Starship
 http://localhost:5000/launches?launchpad=Kennedy
 http://localhost:5000/launches?launchpad=Vandenberg
 http://localhost:5000/launches?launchpad=Cape+Canaveral
@@ -18,10 +18,10 @@ http://localhost:5000/launches?dateFrom=2020-01-01
 http://localhost:5000/launches?dateTo=2019-12-31
 http://localhost:5000/launches?dateFrom=2021-01-01&dateTo=2021-12-31
 http://localhost:5000/launches?dateFrom=2023-01-01&dateTo=2023-12-31
-http://localhost:5000/launches?missionName=Starlink&success=true&rocket=Falcon+9
+http://localhost:5000/launches?missionName=Starlink&success=true&rocketName=Falcon+9
 http://localhost:5000/launches?success=false&dateTo=2015-12-31
 http://localhost:5000/launches?success=true&launchpad=Kennedy&dateFrom=2022-01-01&dateTo=2022-12-31
-http://localhost:5000/launches?upcoming=true&rocket=Falcon+Heavy
+http://localhost:5000/launches?upcoming=true&rocketName=Falcon+Heavy
 http://localhost:5000/launches?missionName=Starlink&dateFrom=2023-01-01&dateTo=2023-12-31&launchpad=Vandenberg
 http://localhost:5000/launches?success=da
 http://localhost:5000/launches?flightNumber=abc

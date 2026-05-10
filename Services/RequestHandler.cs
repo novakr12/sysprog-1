@@ -116,7 +116,7 @@ namespace Sysprog1.Services
             out DateTime? dateFrom, out DateTime? dateTo, out bool? upcoming)
         {
             missionName = qs["missionName"];
-            rocket = qs["rocket"];
+            rocket = qs["rocketName"];
             launchpad = qs["launchpad"];
             success = null; flightNumber = null; dateFrom = null; dateTo = null; upcoming = null;
 
